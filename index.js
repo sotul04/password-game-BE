@@ -84,7 +84,7 @@ app.use("/captchas", routerCaptchas);
 const routerPort = express.Router();
 
 routerPort.get("/", async (_, res) => {
-    return res.status(200).send("Used-port "+port);
+    return res.status(200).send("Used-env "+process.env.MONGODB_URL);
 });
 
 app.use("/port", routerPort);
