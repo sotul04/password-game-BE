@@ -47,6 +47,10 @@ const Captchas = mongoose.model('Captchas', captchasSchema);
 
 const upload = multer({ storage: multer.memoryStorage() });
 
+app.get("/", async (_, res) => {
+    res.send("Welcome to password-game server.")
+});
+
 app.get("/flags", async (_, res) => {
     console.log("GET: sending flags.");
     try {
