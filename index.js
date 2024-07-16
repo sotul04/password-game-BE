@@ -81,6 +81,12 @@ routerCaptchas.get("/", async (_, res) => {
 
 app.use("/captchas", routerCaptchas);
 
+const routerPort = express.Router();
+
+routerPort.get("/", (_, res) => {
+    return res.status(200).send("Used-port "+port);
+})
+
 app.post("/flags", upload.single('image'), async (req, res) => {
     const {title, description} = req.body;
 
