@@ -15,7 +15,7 @@ const defaultSchema = {
     }
 }
 //port used
-const port = process.env.PORT || 3000;
+const port = 3002;
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -64,32 +64,7 @@ routerFlags.get("/" , async (_, res) => {
     }
 });
 
-app.use("/flags", routerFlags);
-
-const routerCaptchas = express.Router();
-
-routerCaptchas.get("/", async (_, res) => {
-    console.log("GET: sending captchas.");
-    try {
-        const images = await Captchas.find({});
-        return res.status(200).send(images);
-    } catch (err) {
-        console.error(err);
-        return res.status(400).send('Error retrieving images.');
-    }
-})
-
-app.use("/captchas", routerCaptchas);
-
-const routerPort = express.Router();
-
-routerPort.get("/", async (_, res) => {
-    return res.status(200).send("Used-env "+port);
-});
-
-app.use("/port", routerPort);
-
-app.post("/flags", upload.single('image'), async (req, res) => {
+routerFlags.post("/", upload.single('image'), async (req, res) => {
     const {title, description} = req.body;
 
     const newFlag = new Flags({
@@ -105,14 +80,29 @@ app.post("/flags", upload.single('image'), async (req, res) => {
 
     try {
         await newFlag.save();
-        res.status(200).send(newFlag);
+        return res.status(200).send(newFlag);
     } catch (error) {
         console.log(error);
-        res.status(400).send("Failed to add flag.");
+        return res.status(400).send("Failed to add flag.");
     }
 });
 
-app.post("/captchas", upload.single('image'), async (req, res) => {
+app.use("/flags", routerFlags);
+
+const routerCaptchas = express.Router();
+
+routerCaptchas.get("/", async (_, res) => {
+    console.log("GET: sending captchas.");
+    try {
+        const images = await Captchas.find({});
+        return res.status(200).send(images);
+    } catch (err) {
+        console.error(err);
+        return res.status(400).send('Error retrieving images.');
+    }
+})
+
+routerCaptchas.post("/", upload.single('image'), async (req, res) => {
     const {title, description} = req.body;
 
     const newCaptcha = new Captchas({
@@ -128,11 +118,21 @@ app.post("/captchas", upload.single('image'), async (req, res) => {
 
     try {
         await newCaptcha.save();
-        res.status(200).send(newCaptcha);
+        return res.status(200).send(newCaptcha);
     } catch (error) {
         console.log(error);
-        res.status(400).send("Failed to add captcha.");
+        return res.status(400).send("Failed to add captcha.");
     }
+})
+
+app.use("/captchas", routerCaptchas);
+
+const routerPort = express.Router();
+
+routerPort.get("/", async (_, res) => {
+    return res.status(200).send("Used-env "+port);
 });
+
+app.use("/port", routerPort);
 
 app.listen(port, () => console.log(`Server is running on port ${port}`));
