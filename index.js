@@ -51,18 +51,24 @@ app.get("/", async (_, res) => {
     res.send("Welcome to password-game server.")
 });
 
-app.get("/flags", async (_, res) => {
+const routerFlags = express.Router();
+
+routerFlags.get("/" , async (_, res) => {
     console.log("GET: sending flags.");
     try {
         const images = await Flags.find({});
-        res.status(200).json(images);
+        return res.status(200).json(images);
     } catch (err) {
         console.error(err);
-        res.status(400).send('Error retrieving images.');
+        return res.status(400).send('Error retrieving images.');
     }
 });
 
-app.get("/captchas", async (_, res) => {
+app.use("/flags", routerFlags);
+
+const routerCaptchas = express.Router();
+
+routerCaptchas.get("/", async (_, res) => {
     console.log("GET: sending captchas.");
     try {
         const images = await Captchas.find({});
@@ -71,7 +77,9 @@ app.get("/captchas", async (_, res) => {
         console.error(err);
         res.status(400).send('Error retrieving images.');
     }
-});
+})
+
+app.use("/captchas", routerCaptchas);
 
 app.post("/flags", upload.single('image'), async (req, res) => {
     const {title, description} = req.body;
