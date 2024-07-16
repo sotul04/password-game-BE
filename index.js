@@ -57,7 +57,7 @@ routerFlags.get("/" , async (_, res) => {
     console.log("GET: sending flags.");
     try {
         const images = await Flags.find({});
-        return res.status(200).json(images);
+        return res.status(200).send(images);
     } catch (err) {
         console.error(err);
         return res.status(400).send('Error retrieving images.');
@@ -72,10 +72,10 @@ routerCaptchas.get("/", async (_, res) => {
     console.log("GET: sending captchas.");
     try {
         const images = await Captchas.find({});
-        res.status(200).json(images);
+        return res.status(200).send(images);
     } catch (err) {
         console.error(err);
-        res.status(400).send('Error retrieving images.');
+        return res.status(400).send('Error retrieving images.');
     }
 })
 
@@ -84,7 +84,7 @@ app.use("/captchas", routerCaptchas);
 const routerPort = express.Router();
 
 routerPort.get("/", async (_, res) => {
-    return res.status(200).send("Used-env "+process.env.MONGODB_URL);
+    return res.status(200).send("Used-env "+port);
 });
 
 app.use("/port", routerPort);
