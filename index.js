@@ -15,7 +15,7 @@ const defaultSchema = {
     }
 }
 //port used
-const port = 3000;
+const port = 8080;
 
 const express = require('express');
 const mongoose = require('mongoose');
