@@ -28,16 +28,20 @@ app.use(bodyParser.json());
 
 app.use((_, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*'); // allow all domains
-    res.setHeader('Access-Control-Allow-Methods', 'GET, PUT');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, POST');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     next();
 });
 
-mongoose.connect(
-    process.env.MONGODB_URL,
-    {}
-);
+mongoose.connect(process.env.MONGODB_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    ssl: true,
+    tlsInsecure: true
+})
+    .then(() => console.log('Database connected!'))
+    .catch(err => console.error('Database connection error:', err));
 
 const flagsSchema = new mongoose.Schema(defaultSchema);
 const captchasSchema = new mongoose.Schema(defaultSchema);
@@ -53,7 +57,7 @@ app.get("/", async (_, res) => {
 
 const routerFlags = express.Router();
 
-routerFlags.get("/" , async (_, res) => {
+routerFlags.get("/", async (_, res) => {
     console.log("GET: sending flags.");
     try {
         const images = await Flags.find({});
@@ -65,7 +69,7 @@ routerFlags.get("/" , async (_, res) => {
 });
 
 routerFlags.post("/", upload.single('image'), async (req, res) => {
-    const {title, description} = req.body;
+    const { title, description } = req.body;
 
     const newFlag = new Flags({
         title,
@@ -103,7 +107,7 @@ routerCaptchas.get("/", async (_, res) => {
 })
 
 routerCaptchas.post("/", upload.single('image'), async (req, res) => {
-    const {title, description} = req.body;
+    const { title, description } = req.body;
 
     const newCaptcha = new Captchas({
         title,
@@ -130,7 +134,7 @@ app.use("/captchas", routerCaptchas);
 const routerPort = express.Router();
 
 routerPort.get("/", async (_, res) => {
-    return res.status(200).send("Used-env "+port);
+    return res.status(200).send("Used-env " + port);
 });
 
 app.use("/port", routerPort);
